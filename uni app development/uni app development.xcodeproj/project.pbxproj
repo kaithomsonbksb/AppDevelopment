@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		9E9653352EF9664D00A2E81E /* uni app development.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "uni app development.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E9653352EF9664D00A2E81E /* uni app development.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "uni app development.app"; path = "/Users/kai.thomson/Desktop/Assignments/uni_VSC/app_development/uni app development/build/Debug-iphoneos/uni app development.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				9E9653372EF9664D00A2E81E /* uni app development */,
-				9E9653362EF9664D00A2E81E /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		9E9653362EF9664D00A2E81E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9E9653352EF9664D00A2E81E /* uni app development.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,7 +86,7 @@
 			mainGroup = 9E96532C2EF9664D00A2E81E;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 9E9653362EF9664D00A2E81E /* Products */;
+			productRefGroup = 9E96532C2EF9664D00A2E81E;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
