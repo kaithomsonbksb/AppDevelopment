@@ -8,24 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var count = 0
+    @StateObject private var loginViewModel = LoginViewModel()
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "star.fill")
-                .imageScale(.large)
-                .foregroundStyle(.yellow)
-            Text("You've tapped the button \(count) times!")
-                .font(.headline)
-            Button("Tap Me") {
-                count += 1
-            }
-            .padding()
-            .background(.blue)
-            .foregroundColor(.white)
-            .clipShape(Capsule())
+        if loginViewModel.isLoggedIn {
+            // Placeholder for main app content
+            Text("Welcome to Coastline Perks!")
+                .font(.title)
+                .padding()
+        } else {
+            LoginView(viewModel: loginViewModel)
         }
-        .padding()
     }
 }
 
