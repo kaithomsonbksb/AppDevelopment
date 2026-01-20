@@ -8,16 +8,31 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var loginViewModel = LoginViewModel()
+    @StateObject private var loginSystemModel = LoginSystemModel()
 
     var body: some View {
-        if loginViewModel.isLoggedIn {
-            // Placeholder for main app content
-            Text("Welcome to Coastline Perks!")
-                .font(.title)
-                .padding()
+        if loginSystemModel.isLoggedIn {
+            VStack(spacing: 24) {
+                Text("Welcome to Coastline Perks!")
+                    .font(.title)
+                    .padding()
+                Button(action: {
+                    loginSystemModel.isLoggedIn = false
+                    loginSystemModel.email = ""
+                    loginSystemModel.password = ""
+                    loginSystemModel.error = nil
+                }) {
+                    Text("Logout")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+            }
+            .padding()
         } else {
-            LoginView(viewModel: loginViewModel)
+            LoginView(viewModel: loginSystemModel)
         }
     }
 }
