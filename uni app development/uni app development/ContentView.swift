@@ -8,24 +8,32 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var count = 0
+    @StateObject private var loginSystemModel = LoginSystemModel()
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "star.fill")
-                .imageScale(.large)
-                .foregroundStyle(.yellow)
-            Text("You've tapped the button \(count) times!")
-                .font(.headline)
-            Button("Tap Me") {
-                count += 1
+        if loginSystemModel.isLoggedIn {
+            VStack(spacing: 24) {
+                Text("Welcome to Coastline Perks!")
+                    .font(.title)
+                    .padding()
+                Button(action: {
+                    loginSystemModel.isLoggedIn = false
+                    loginSystemModel.email = ""
+                    loginSystemModel.password = ""
+                    loginSystemModel.error = nil
+                }) {
+                    Text("Logout")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
             }
             .padding()
-            .background(.blue)
-            .foregroundColor(.white)
-            .clipShape(Capsule())
+        } else {
+            LoginView(viewModel: loginSystemModel)
         }
-        .padding()
     }
 }
 
