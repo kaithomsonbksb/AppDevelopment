@@ -8,15 +8,19 @@ CORS(app)
 # Initialize DB
 conn = sqlite3.connect("users.db", check_same_thread=False)
 cursor = conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, password TEXT)''')
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, password TEXT)"""
+)
 conn.commit()
+
 
 @app.route("/", methods=["GET"])
 def home():
     cursor.execute("SELECT email FROM users")
     users = cursor.fetchall()
-    
-    html = """
+
+    html = (
+        """
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -199,10 +203,13 @@ def home():
             <div class="status online">● Server is online</div>
             
             <div class="users-section">
-                <h2>📊 Registered Users (""" + str(len(users)) + """)</h2>
+                <h2>📊 Registered Users ("""
+        + str(len(users))
+        + """)</h2>
                 <ul class="user-list">
     """
-    
+    )
+
     if users:
         for user in users:
             html += f"""
@@ -218,7 +225,7 @@ def home():
         html += """
                     <li class="empty-state">No users registered yet</li>
         """
-    
+
     html += """
                 </ul>
             </div>
@@ -314,8 +321,9 @@ def home():
     </body>
     </html>
     """
-    
+
     return render_template_string(html)
+
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -327,11 +335,14 @@ def signup():
     if not email or not password:
         return jsonify({"error": "Missing email or password"}), 400
     try:
-        cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, password))
+        cursor.execute(
+            "INSERT INTO users (email, password) VALUES (?, ?)", (email, password)
+        )
         conn.commit()
         return jsonify({"message": "User created"}), 201
     except sqlite3.IntegrityError:
         return jsonify({"error": "User already exists"}), 409
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -342,18 +353,22 @@ def login():
     password = data.get("password")
     if not email or not password:
         return jsonify({"error": "Missing email or password"}), 400
-    cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+    cursor.execute(
+        "SELECT * FROM users WHERE email=? AND password=?", (email, password)
+    )
     user = cursor.fetchone()
     if user:
         return jsonify({"message": "Login successful"}), 200
     else:
         return jsonify({"error": "Invalid credentials"}), 401
 
+
 @app.route("/clear", methods=["POST"])
 def clear():
     cursor.execute("DELETE FROM users")
     conn.commit()
     return jsonify({"message": "All user data cleared"}), 200
+
 
 @app.route("/delete", methods=["POST"])
 def delete():
@@ -367,6 +382,7 @@ def delete():
     conn.commit()
     return jsonify({"message": "User deleted"}), 200
 
+
 @app.route("/edit", methods=["POST"])
 def edit():
     data = request.json
@@ -379,6 +395,7 @@ def edit():
     cursor.execute("UPDATE users SET password=? WHERE email=?", (password, email))
     conn.commit()
     return jsonify({"message": "User password updated"}), 200
+
 
 if __name__ == "__main__":
     app.run(host="192.168.1.91", port=5000)
