@@ -15,7 +15,7 @@ class HomeViewModel: ObservableObject {
     func fetchAssignedPerks() {
         isLoading = true
         error = nil
-        guard let url = URL(string: "http://192.168.1.91:5000/assignments?email=\(email)") else {
+        guard let url = URL(string: "http://192.168.1.177:5000/assignments?email=\(email)") else {
             self.error = "Invalid URL"
             self.isLoading = false
             return
