@@ -11,7 +11,26 @@ cursor = conn.cursor()
 cursor.execute(
     """CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, password TEXT)"""
 )
+# Try to add credits column if it doesn't exist
+try:
+    cursor.execute("ALTER TABLE users ADD COLUMN credits INTEGER DEFAULT 50")
+    conn.commit()
+except sqlite3.OperationalError as e:
+    if "duplicate column name" not in str(e):
+        raise
+# Create assignments table if not exists
+cursor.execute("""CREATE TABLE IF NOT EXISTS assignments (email TEXT, perk_id TEXT)""")
 conn.commit()
+
+
+@app.route("/assignments", methods=["GET"])
+def assignments():
+    email = request.args.get("email")
+    if not email:
+        return jsonify({"error": "Missing email"}), 400
+    cursor.execute("SELECT perk_id FROM assignments WHERE email=?", (email,))
+    perks = [row[0] for row in cursor.fetchall()]
+    return jsonify(sorted(perks)), 200
 
 
 @app.route("/", methods=["GET"])
@@ -336,10 +355,11 @@ def signup():
         return jsonify({"error": "Missing email or password"}), 400
     try:
         cursor.execute(
-            "INSERT INTO users (email, password) VALUES (?, ?)", (email, password)
+            "INSERT INTO users (email, password, credits) VALUES (?, ?, ?)",
+            (email, password, 50),
         )
         conn.commit()
-        return jsonify({"message": "User created"}), 201
+        return jsonify({"message": "User signed up successfully"}), 201
     except sqlite3.IntegrityError:
         return jsonify({"error": "User already exists"}), 409
 
@@ -360,7 +380,7 @@ def login():
     if user:
         return jsonify({"message": "Login successful"}), 200
     else:
-        return jsonify({"error": "Invalid credentials"}), 401
+        return jsonify({"error": "Invalid email or password"}), 401
 
 
 @app.route("/clear", methods=["POST"])
@@ -397,5 +417,47 @@ def edit():
     return jsonify({"message": "User password updated"}), 200
 
 
+@app.route("/balance", methods=["GET"])
+def balance():
+    email = request.args.get("email")
+    if not email:
+        return jsonify({"error": "Missing email"}), 400
+    cursor.execute("SELECT credits FROM users WHERE email=?", (email,))
+    row = cursor.fetchone()
+    if row:
+        return jsonify({"balance": row[0]}), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+
+@app.route("/add_perk", methods=["POST"])
+def add_perk():
+    data = request.json
+    if not data:
+        return jsonify({"error": "No JSON data provided"}), 400
+    email = data.get("email")
+    perk_id = data.get("perk_id")
+    if not email or not perk_id:
+        return jsonify({"error": "Missing email or perk_id"}), 400
+    # For demo, all perks cost 10 credits
+    cost = 10
+    cursor.execute("SELECT credits FROM users WHERE email=?", (email,))
+    row = cursor.fetchone()
+    if not row:
+        return jsonify({"error": "User not found"}), 404
+    balance = row[0]
+    if balance < cost:
+        return jsonify({"error": "Insufficient balance"}), 400
+    # Deduct credits
+    cursor.execute(
+        "UPDATE users SET credits = credits - ? WHERE email=?", (cost, email)
+    )
+    conn.commit()
+    # Here you would also assign the perk to the user in a real app
+    cursor.execute("SELECT credits FROM users WHERE email=?", (email,))
+    new_balance = cursor.fetchone()[0]
+    return jsonify({"message": "Perk added", "balance": new_balance}), 200
+
+
 if __name__ == "__main__":
-    app.run(host="192.168.1.91", port=5000)
+    app.run(host="192.168.1.177", port=5000)
