@@ -20,8 +20,8 @@ struct HomeView: View {
                     if viewModel.isLoading {
                         ProgressView("Loading perks...")
                             .padding()
-                    } else if let error = viewModel.error {
-                        Text(error)
+                    } else if let errorMessage = viewModel.errorMessage {
+                        Text(errorMessage)
                             .foregroundColor(.red)
                             .padding()
                     } else if viewModel.assignedPerks.isEmpty {
