@@ -4,7 +4,7 @@ import Combine
 class HomeViewModel: ObservableObject {
     @Published var assignedPerks: [Perk] = []
     @Published var isLoading: Bool = false
-    @Published var error: String?
+    @Published var errorMessage: String? = nil
     @Published var balance: Int = 0
     @Published var isOffline: Bool = false
     let email: String
@@ -73,10 +73,10 @@ class HomeViewModel: ObservableObject {
     
     func fetchAssignedPerks() {
         isLoading = true
-        error = nil
+        errorMessage = nil
         isOffline = false
         guard let url = URL(string: "http://192.168.1.177:5000/assignments?email=\(email)") else {
-            self.error = "Invalid URL"
+            self.errorMessage = "Invalid URL"
             self.isLoading = false
             return
         }
@@ -85,40 +85,41 @@ class HomeViewModel: ObservableObject {
                 self.isLoading = false
                 if let error = error {
                     // API failed, try offline cache
-                    self.loadCachedEntitlements()
+                    self.loadCachedEntitlements(apiError: error.localizedDescription)
                     return
                 }
                 guard let data = data else {
                     // API failed, try offline cache
-                    self.loadCachedEntitlements()
+                    self.loadCachedEntitlements(apiError: "No data from server")
                     return
                 }
-                do {
-                    let ids = try JSONDecoder().decode([String].self, from: data)
-                    print("[DEBUG] Perk IDs from backend: \(ids)")
+                // Try to decode as [String], else try to parse error JSON
+                if let ids = try? JSONDecoder().decode([String].self, from: data) {
                     EntitlementCache.save(ids: ids, for: self.email)
                     let mapped = ids.compactMap { PerkCatalogue.perk(for: $0) }
-                    print("[DEBUG] Mapped perks: \(mapped)")
                     self.assignedPerks = mapped
                     self.isOffline = false
-                } catch {
-                    // API failed, try offline cache
-                    self.loadCachedEntitlements()
+                    self.errorMessage = nil
+                } else if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let errMsg = (json["error"] as? String) ?? (json["message"] as? String) {
+                    // API returned error JSON
+                    self.loadCachedEntitlements(apiError: errMsg)
+                } else {
+                    self.loadCachedEntitlements(apiError: "Failed to parse perks")
                 }
             }
         }.resume()
     }
 
-    private func loadCachedEntitlements() {
+    private func loadCachedEntitlements(apiError: String?) {
         let cachedIds = EntitlementCache.load(for: email)
         if let ids = cachedIds, !ids.isEmpty {
             self.assignedPerks = ids.compactMap { PerkCatalogue.perk(for: $0) }
             self.isOffline = true
-            self.error = nil
+            self.errorMessage = apiError != nil ? "Offline mode: " + apiError! : nil
         } else {
             self.assignedPerks = []
             self.isOffline = true
-            self.error = "No cached perks available."
+            self.errorMessage = (apiError ?? "") + (apiError != nil ? ". " : "") + "No cached perks available."
         }
     }
 }
