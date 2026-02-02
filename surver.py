@@ -452,12 +452,15 @@ def add_perk():
     cursor.execute(
         "UPDATE users SET credits = credits - ? WHERE email=?", (cost, email)
     )
+    # Assign the perk to the user
+    cursor.execute(
+        "INSERT INTO assignments (email, perk_id) VALUES (?, ?)", (email, perk_id)
+    )
     conn.commit()
-    # Here you would also assign the perk to the user in a real app
     cursor.execute("SELECT credits FROM users WHERE email=?", (email,))
     new_balance = cursor.fetchone()[0]
     return jsonify({"message": "Perk added", "balance": new_balance}), 200
 
 
 if __name__ == "__main__":
-    app.run(host="192.168.1.177", port=5000)
+    app.run(host="192.168.1.151", port=5000)
