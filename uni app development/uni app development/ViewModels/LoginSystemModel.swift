@@ -3,7 +3,7 @@ import Combine
 
 class LoginSystemModel: ObservableObject {
         func signup() {
-            guard let url = URL(string: "http://192.168.1.91:5000/signup") else { return }
+            guard let url = URL(string: "http://192.168.1.177:5000/signup") else { return }
 
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
@@ -43,7 +43,7 @@ class LoginSystemModel: ObservableObject {
     @Published var error: String?
     @Published var isLoggedIn: Bool = false
         func login() {
-            guard let url = URL(string: "http://192.168.1.91:5000/login") else { return }
+            guard let url = URL(string: "http://192.168.1.177:5000/login") else { return }
 
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
