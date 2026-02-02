@@ -23,8 +23,8 @@ struct LoginView: View {
                     .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                     .accessibilityIdentifier("passwordField")
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
+                if let error = viewModel.error {
+                    Text(error)
                         .foregroundColor(.red)
                         .accessibilityIdentifier("errorText")
                 }
