@@ -8,12 +8,37 @@ class HomeViewModel: ObservableObject {
     @Published var balance: Int = 0
     @Published var isOffline: Bool = false
     let email: String
+    @Published var savedPerks: [SavedPerk] = []
     private var cancellables = Set<AnyCancellable>()
 
     init(email: String) {
         self.email = email
         fetchBalance()
         fetchAssignedPerks()
+        loadSaved()
+    }
+    // MARK: - Local CRUD for SavedPerk
+    func loadSaved() {
+        savedPerks = SavedPerkStore.load()
+    }
+
+    func createSaved(perkId: String) {
+        guard !savedPerks.contains(where: { $0.id == perkId }) else { return }
+        let new = SavedPerk(id: perkId, note: "", savedAt: Date())
+        savedPerks.append(new)
+        SavedPerkStore.save(savedPerks)
+    }
+
+    func updateSaved(perkId: String, note: String) {
+        if let idx = savedPerks.firstIndex(where: { $0.id == perkId }) {
+            savedPerks[idx].note = note
+            SavedPerkStore.save(savedPerks)
+        }
+    }
+
+    func deleteSaved(perkId: String) {
+        savedPerks.removeAll { $0.id == perkId }
+        SavedPerkStore.save(savedPerks)
     }
 
     func fetchBalance() {
