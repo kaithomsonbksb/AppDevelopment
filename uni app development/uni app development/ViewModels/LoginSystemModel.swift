@@ -45,28 +45,24 @@ class LoginSystemModel: ObservableObject {
         func login() {
             guard let url = URL(string: "http://192.168.1.177:5000/login") else { return }
 
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        private let apiService: APIServiceProtocol
 
-            let body: [String: String] = ["email": email, "password": password]
-            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        init(apiService: APIServiceProtocol = APIService()) {
+            self.apiService = apiService
+        }
 
-            URLSession.shared.dataTask(with: request) { data, response, error in
+        func signup() {
+            apiService.signup(email: email, password: password) { result in
                 DispatchQueue.main.async {
-                    if let httpResponse = response as? HTTPURLResponse {
-                        if httpResponse.statusCode == 200 {
-                            self.isLoggedIn = true
-                            self.error = nil
-                        } else {
-                            self.error = "Login failed"
-                            self.isLoggedIn = false
-                        }
-                    } else {
-                        self.error = "Server error"
+                    switch result {
+                    case .success:
+                        self.isLoggedIn = true
+                        self.error = nil
+                    case .failure(let error):
                         self.isLoggedIn = false
+                        self.error = error
                     }
                 }
-            }.resume()
+            }
         }
-}
+                    }
