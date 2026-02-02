@@ -9,6 +9,11 @@ struct HomeView: View {
         NavigationView {
             ZStack(alignment: .top) {
                 VStack {
+                    if viewModel.isOffline {
+                        Text("Offline mode: showing cached perks")
+                            .foregroundColor(.orange)
+                            .padding(.top)
+                    }
                     Text("Assigned Perks")
                         .font(.largeTitle)
                         .padding(.top)
@@ -20,7 +25,7 @@ struct HomeView: View {
                             .foregroundColor(.red)
                             .padding()
                     } else if viewModel.assignedPerks.isEmpty {
-                        Text("No perks assigned.")
+                        Text(viewModel.isOffline ? "No cached perks available." : "No perks assigned.")
                             .foregroundColor(.gray)
                             .padding()
                     } else {
