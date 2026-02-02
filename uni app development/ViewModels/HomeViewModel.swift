@@ -1,28 +1,3 @@
-// Store for unsynced perk assignments (offline support)
-struct UnsyncedAssignmentsStore {
-    private static let key = "unsynced_assignments"
-    static func load(for email: String) -> [String] {
-        let dict = UserDefaults.standard.dictionary(forKey: key) as? [String: [String]] ?? [:]
-        return dict[email] ?? []
-    }
-    static func save(_ perks: [String], for email: String) {
-        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: [String]] ?? [:]
-        dict[email] = perks
-        UserDefaults.standard.set(dict, forKey: key)
-    }
-    static func add(_ perkId: String, for email: String) {
-        var current = load(for: email)
-        if !current.contains(perkId) {
-            current.append(perkId)
-            save(current, for: email)
-        }
-    }
-    static func clear(for email: String) {
-        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: [String]] ?? [:]
-        dict[email] = []
-        UserDefaults.standard.set(dict, forKey: key)
-    }
-}
 import Foundation
 import Combine
 
@@ -179,5 +154,29 @@ class HomeViewModel: ObservableObject {
             self.isOffline = true
             self.errorMessage = (apiError ?? "") + (apiError != nil ? ". " : "") + "No cached perks available."
         }
+    }
+}
+struct UnsyncedAssignmentsStore {
+    private static let key = "unsynced_assignments"
+    static func load(for email: String) -> [String] {
+        let dict = UserDefaults.standard.dictionary(forKey: key) as? [String: [String]] ?? [:]
+        return dict[email] ?? []
+    }
+    static func save(_ perks: [String], for email: String) {
+        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: [String]] ?? [:]
+        dict[email] = perks
+        UserDefaults.standard.set(dict, forKey: key)
+    }
+    static func add(_ perkId: String, for email: String) {
+        var current = load(for: email)
+        if !current.contains(perkId) {
+            current.append(perkId)
+            save(current, for: email)
+        }
+    }
+    static func clear(for email: String) {
+        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: [String]] ?? [:]
+        dict[email] = []
+        UserDefaults.standard.set(dict, forKey: key)
     }
 }

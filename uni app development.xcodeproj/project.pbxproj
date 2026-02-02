@@ -19,6 +19,7 @@
 /* Begin PBXFileReference section */
 		9E4B6D612F3151A600E3E473 /* uni app development.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "uni app development.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E4B6D662F3152F600E3E473 /* uni app developmentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "uni app developmentTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E4B6D782F31591C00E3E473 /* uni app development.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "uni app development.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +53,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9E4B6D792F31591C00E3E473 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		9E96532C2EF9664D00A2E81E = {
 			isa = PBXGroup;
 			children = (
@@ -142,6 +148,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9E96532C2EF9664D00A2E81E;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 9E4B6D792F31591C00E3E473 /* Products */;
+					ProjectRef = 9E4B6D782F31591C00E3E473 /* uni app development.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				9E9653342EF9664D00A2E81E /* uni app development */,
