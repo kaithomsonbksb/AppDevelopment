@@ -90,5 +90,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(viewModel: HomeViewModel(email: "demo@example.com"))
+    HomeView(viewModel: HomeViewModel(email: "demo@example.com"), loginSystemModel: LoginSystemModel())
 }
