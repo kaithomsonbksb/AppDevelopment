@@ -2,7 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
-    
+    @ObservedObject var loginSystemModel: LoginSystemModel
     @State private var showPerkPicker = false
 
     var body: some View {
@@ -72,7 +72,13 @@ struct HomeView: View {
                     }
                 }
             }
+
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("Logout") {
+                loginSystemModel.isLoggedIn = false
+                loginSystemModel.email = ""
+                loginSystemModel.password = ""
+            })
             .onAppear {
                 viewModel.fetchAssignedPerks()
             }
