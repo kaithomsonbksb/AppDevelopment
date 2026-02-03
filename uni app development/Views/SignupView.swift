@@ -22,8 +22,8 @@ struct SignupView: View {
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(8)
                 .accessibilityIdentifier("signupPasswordField")
-            if let error = viewModel.error {
-                Text(error)
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
                     .foregroundColor(.red)
                     .accessibilityIdentifier("signupErrorText")
             }
