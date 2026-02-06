@@ -1,8 +1,9 @@
 import SwiftUI
 
+
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
-    @ObservedObject var loginSystemModel: LoginSystemModel
+    let onLogout: () -> Void
     @State private var showPerkPicker = false
 
     var body: some View {
@@ -42,12 +43,11 @@ struct HomeView: View {
                     Spacer()
                 }
                 HStack {
-                    // Balance display
                     VStack(alignment: .leading) {
                         HStack(spacing: 6) {
                             Image(systemName: "creditcard")
                                 .foregroundColor(.black)
-                            Text("\(viewModel.balance)")
+                            Text("\(viewModel.credits)")
                                 .bold()
                                 .foregroundColor(.black)
                         }
@@ -56,7 +56,6 @@ struct HomeView: View {
                         Spacer()
                     }
                     Spacer()
-                    // Plus button
                     VStack(alignment: .trailing) {
                         HStack {
                             Spacer()
@@ -75,9 +74,7 @@ struct HomeView: View {
 
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(trailing: Button("Logout") {
-                loginSystemModel.isLoggedIn = false
-                loginSystemModel.email = ""
-                loginSystemModel.password = ""
+                onLogout()
             })
             .onAppear {
                 viewModel.fetchAssignedPerks()
@@ -90,5 +87,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(viewModel: HomeViewModel(email: "demo@example.com"), loginSystemModel: LoginSystemModel())
+    HomeView(viewModel: HomeViewModel(email: "demo@example.com"), onLogout: {})
 }

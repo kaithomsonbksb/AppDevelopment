@@ -8,17 +8,14 @@ CORS(app)
 # Initialize DB
 conn = sqlite3.connect("users.db", check_same_thread=False)
 cursor = conn.cursor()
-cursor.execute(
-    """CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, password TEXT)"""
-)
-# Try to add credits column if it doesn't exist
+# Add credits column if missing
 try:
     cursor.execute("ALTER TABLE users ADD COLUMN credits INTEGER DEFAULT 50")
-    conn.commit()
-except sqlite3.OperationalError as e:
-    if "duplicate column name" not in str(e):
-        raise
-# Create assignments table if not exists
+except sqlite3.OperationalError:
+    pass  # Column already exists
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, password TEXT, credits INTEGER DEFAULT 50)"""
+)
 cursor.execute("""CREATE TABLE IF NOT EXISTS assignments (email TEXT, perk_id TEXT)""")
 conn.commit()
 
@@ -28,6 +25,11 @@ def assignments():
     email = request.args.get("email")
     if not email:
         return jsonify({"error": "Missing email"}), 400
+
+    cursor.execute("SELECT 1 FROM users WHERE email=?", (email,))
+    if cursor.fetchone() is None:
+        return jsonify({"error": "User not found"}), 404
+
     cursor.execute("SELECT perk_id FROM assignments WHERE email=?", (email,))
     perks = [row[0] for row in cursor.fetchall()]
     return jsonify(sorted(perks)), 200
@@ -359,7 +361,7 @@ def signup():
             (email, password, 50),
         )
         conn.commit()
-        return jsonify({"message": "User signed up successfully"}), 201
+        return jsonify({"message": "User signed up successfully"}), 200
     except sqlite3.IntegrityError:
         return jsonify({"error": "User already exists"}), 409
 
@@ -439,7 +441,6 @@ def add_perk():
     perk_id = data.get("perk_id")
     if not email or not perk_id:
         return jsonify({"error": "Missing email or perk_id"}), 400
-    # For demo, all perks cost 10 credits
     cost = 10
     cursor.execute("SELECT credits FROM users WHERE email=?", (email,))
     row = cursor.fetchone()
@@ -448,6 +449,12 @@ def add_perk():
     balance = row[0]
     if balance < cost:
         return jsonify({"error": "Insufficient balance"}), 400
+    # Check if user already has this perk
+    cursor.execute(
+        "SELECT 1 FROM assignments WHERE email=? AND perk_id=?", (email, perk_id)
+    )
+    if cursor.fetchone():
+        return jsonify({"error": "Perk already assigned to user"}), 409
     # Deduct credits
     cursor.execute(
         "UPDATE users SET credits = credits - ? WHERE email=?", (cost, email)
@@ -460,6 +467,12 @@ def add_perk():
     cursor.execute("SELECT credits FROM users WHERE email=?", (email,))
     new_balance = cursor.fetchone()[0]
     return jsonify({"message": "Perk added", "balance": new_balance}), 200
+
+
+# Health check endpoint
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"}), 200
 
 
 if __name__ == "__main__":

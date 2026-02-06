@@ -2,7 +2,9 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var viewModel: LoginSystemModel
-    
+    let onLogin: (String) -> Void
+    let onSignup: (String) -> Void
+
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
@@ -10,7 +12,7 @@ struct LoginView: View {
                     .font(.largeTitle)
                     .bold()
                     .accessibilityIdentifier("title")
-                TextField("Email", text: $viewModel.email)
+                TextField("Email", text: $viewModel.userEmail)
                     .textContentType(.emailAddress)
                     .autocapitalization(.none)
                     .keyboardType(.emailAddress)
@@ -29,7 +31,11 @@ struct LoginView: View {
                         .accessibilityIdentifier("errorText")
                 }
                 Button(action: {
-                    viewModel.login()
+                    viewModel.login { success in
+                        if success {
+                            onLogin(viewModel.userEmail)
+                        }
+                    }
                 }) {
                     Text("Login")
                         .frame(maxWidth: .infinity)
@@ -39,7 +45,7 @@ struct LoginView: View {
                         .cornerRadius(8)
                 }
                 .accessibilityIdentifier("loginButton")
-                NavigationLink(destination: SignupView(viewModel: viewModel)) {
+                NavigationLink(destination: SignupView(viewModel: viewModel, onSignup: onSignup)) {
                     Text("Don't have an account? Sign Up")
                         .foregroundColor(.blue)
                         .padding(.top, 8)
