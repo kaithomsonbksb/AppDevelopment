@@ -1,0 +1,58 @@
+import SwiftUI
+
+struct LoginView: View {
+    @ObservedObject var viewModel: LoginSystemModel
+    let onLogin: (String) -> Void
+    let onSignup: (String) -> Void
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 24) {
+                Text("Coastline Perks")
+                    .font(.largeTitle)
+                    .bold()
+                    .accessibilityIdentifier("title")
+                TextField("Email", text: $viewModel.userEmail)
+                    .textContentType(.emailAddress)
+                    .autocapitalization(.none)
+                    .keyboardType(.emailAddress)
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
+                    .accessibilityIdentifier("emailField")
+                SecureField("Password", text: $viewModel.password)
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
+                    .accessibilityIdentifier("passwordField")
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .accessibilityIdentifier("errorText")
+                }
+                Button(action: {
+                    viewModel.login { success in
+                        if success {
+                            onLogin(viewModel.userEmail)
+                        }
+                    }
+                }) {
+                    Text("Login")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .accessibilityIdentifier("loginButton")
+                NavigationLink(destination: SignupView(viewModel: viewModel, onSignup: onSignup)) {
+                    Text("Don't have an account? Sign Up")
+                        .foregroundColor(.blue)
+                        .padding(.top, 8)
+                }
+                .accessibilityIdentifier("signupLink")
+            }
+            .padding()
+        }
+    }
+}
