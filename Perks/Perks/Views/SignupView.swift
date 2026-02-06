@@ -2,14 +2,15 @@ import SwiftUI
 
 struct SignupView: View {
     @ObservedObject var viewModel: LoginSystemModel
-    
+    let onSignup: (String) -> Void
+
     var body: some View {
         VStack(spacing: 24) {
             Text("Sign Up")
                 .font(.largeTitle)
                 .bold()
                 .accessibilityIdentifier("signupTitle")
-            TextField("Email", text: $viewModel.email)
+            TextField("Email", text: $viewModel.userEmail)
                 .textContentType(.emailAddress)
                 .autocapitalization(.none)
                 .keyboardType(.emailAddress)
@@ -28,7 +29,11 @@ struct SignupView: View {
                     .accessibilityIdentifier("signupErrorText")
             }
             Button(action: {
-                viewModel.signup()
+                viewModel.signup { success in
+                    if success {
+                        onSignup(viewModel.userEmail)
+                    }
+                }
             }) {
                 Text("Sign Up")
                     .frame(maxWidth: .infinity)
@@ -45,6 +50,6 @@ struct SignupView: View {
 
 struct SignupView_Previews: PreviewProvider {
     static var previews: some View {
-        SignupView(viewModel: LoginSystemModel())
+        SignupView(viewModel: LoginSystemModel(), onSignup: { _ in })
     }
 }

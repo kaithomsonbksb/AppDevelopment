@@ -21,7 +21,7 @@ Coastline Perks is a native iOS app (SwiftUI, MVVM) with a Flask backend and SQL
 	The server runs on `http://(current public ip):5000` by default. Update the host/port in `surver.py` if needed.
 
 ## How to Run the iOS App
-1. Open the `uni app development.xcodeproj` in Xcode (v14+ recommended).
+1. Open the `perks.xcodeproj` in Xcode (v14+ recommended).
 2. Select a simulator (e.g., iPhone 15) and build/run the app (Cmd+R).
 3. Ensure your Mac and device/simulator are on the same network as the backend server.
 
@@ -31,6 +31,17 @@ Coastline Perks is a native iOS app (SwiftUI, MVVM) with a Flask backend and SQL
 - No separate seed script is required; all data is created via the app or backend endpoints.
 
 ## How to Run Tests
+
 1. In Xcode, open the Test Navigator (Cmd+6).
 2. Select and run tests (Cmd+U). Ensure the test target is selected.
+
+## Offline-Read: How It Works
+
+**Offline-read** means the app can display previously assigned perks even when the backend is unreachable (e.g., no network). When you log in offline, the app loads your last assigned perks from local storage (EntitlementCache) and maps them to the PerkCatalogue for display. You can still view and manage your saved perks locally, but cannot fetch new assignments until you are back online.
+
+## Test Coverage
+
+- The app includes unit tests for key local storage logic (e.g., EntitlementCache, LoginSystemModel).
+- To run all tests, use Cmd+U in Xcode with the test target selected.
+- Backend endpoints can be tested with curl or Postman (see surver.py for available routes).
 
